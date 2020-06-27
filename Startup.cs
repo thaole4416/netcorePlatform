@@ -1,8 +1,10 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace Platform
 {
@@ -17,10 +19,12 @@ namespace Platform
                 options.IdleTimeout = TimeSpan.FromMinutes(30);
                 options.Cookie.IsEssential = true;
             });
+            services.AddHsts(opts => {opts.MaxAge = TimeSpan.FromDays(1);opts.IncludeSubDomains = true;});
         }
 
-        public void Configure(IApplicationBuilder app)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            if (env.IsProduction()) {app.UseHsts();} 
             app.UseDeveloperExceptionPage();
             app.UseHttpsRedirection();
             app.UseCookiePolicy();
