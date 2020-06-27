@@ -18,17 +18,22 @@ namespace Platform
             app.UseRouting();
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapGet("{first:alpha:length(3)}/{second:bool}", async context => {
+                endpoints.MapGet("{first:alpha:length(3)}/{second:bool}", async context =>
+                {
                     await context.Response.WriteAsync("Request Was Routed\n");
                     foreach (var kvp in context.Request.RouteValues)
                     {
                         await context.Response.WriteAsync($"{kvp.Key}: {kvp.Value}\n");
                     }
                 });
-                endpoints.MapGet("capital/{country:regex(^uk|france|monaco$)}",Capital.Endpoint);
+                endpoints.MapGet("capital/{country:regex(^uk|france|monaco$)}", Capital.Endpoint);
                 endpoints.MapGet("something/{city?}", Population.Endpoint)
                     .WithMetadata(new RouteNameMetadata("population"));
                 ;
+                endpoints.MapFallback(async context =>
+                {
+                    await context.Response.WriteAsync("Routed to fallback endpoint");
+                });
             });
             app.Use(async (context, next) => { await context.Response.WriteAsync("Terminal Middleware Reached"); });
         }
