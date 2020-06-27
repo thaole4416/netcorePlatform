@@ -11,7 +11,7 @@ namespace Platform
     {
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddTransient<IResponseFormatter, GuidService>();
+            services.AddScoped<IResponseFormatter, GuidService>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
