@@ -8,6 +8,7 @@ namespace Platform
     {
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDistributedMemoryCache(opts => { opts.SizeLimit = 200; });
         }
 
         public void Configure(IApplicationBuilder app)
