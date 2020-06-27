@@ -18,16 +18,17 @@ namespace Platform
             app.UseRouting();
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapGet("{first}/{second}/{third}", async context =>
-                {
+                endpoints.MapGet("files/{filename}.{ext}", async context => {
                     await context.Response.WriteAsync("Request Was Routed\n");
                     foreach (var kvp in context.Request.RouteValues)
                     {
                         await context.Response.WriteAsync($"{kvp.Key}: {kvp.Value}\n");
                     }
                 });
-                endpoints.MapGet("capital/{country}", Capital.Endpoint);
-                endpoints.MapGet("something/{city}", Population.Endpoint).WithMetadata(new RouteNameMetadata("population"));;
+                endpoints.MapGet("capital/{country=France}", Capital.Endpoint);
+                endpoints.MapGet("something/{city?}", Population.Endpoint)
+                    .WithMetadata(new RouteNameMetadata("population"));
+                ;
             });
             app.Use(async (context, next) => { await context.Response.WriteAsync("Terminal Middleware Reached"); });
         }
