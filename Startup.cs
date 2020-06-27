@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -21,10 +22,7 @@ namespace Platform
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddScoped<ITimeStamper, DefaultTimeStamper>();
-            services.AddScoped<IResponseFormatter, TextResponseFormatter>();
-            services.AddScoped<IResponseFormatter, HtmlResponseFormatter>();
-            services.AddScoped<IResponseFormatter, GuidService>();
+            services.AddSingleton(typeof(ICollection<>), typeof(List<>));
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -46,16 +44,23 @@ namespace Platform
             });
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapGet("/single", async context =>
+                endpoints.MapGet("/string", async context =>
                 {
-                    IResponseFormatter formatter = context.RequestServices.GetService<IResponseFormatter>();
-                    await formatter.Format(context, "Single service");
+                    ICollection<string> collection = context.RequestServices.GetService<ICollection<string>>();
+                    collection.Add($"Request: {DateTime.Now.ToLongTimeString()}");
+                    foreach (string str in collection)
+                    {
+                        await context.Response.WriteAsync($"String: {str}\n");
+                    }
                 });
-                endpoints.MapGet("/", async context =>
+                endpoints.MapGet("/int", async context =>
                 {
-                    IResponseFormatter formatter = context.RequestServices.GetServices<IResponseFormatter>()
-                        .First(f => f.RichOutput);
-                    await formatter.Format(context, "Multiple services");
+                    ICollection<int> collection = context.RequestServices.GetService<ICollection<int>>();
+                    collection.Add(collection.Count() + 1);
+                    foreach (int val in collection)
+                    {
+                        await context.Response.WriteAsync($"Int: {val}\n");
+                    }
                 });
             });
         }
