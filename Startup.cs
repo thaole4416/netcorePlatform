@@ -1,7 +1,9 @@
+using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Platform.Services;
 
@@ -9,10 +11,22 @@ namespace Platform
 {
     public class Startup
     {
+        public Startup(IConfiguration config)
+        {
+            Configuration = config;
+        }
+
+        private IConfiguration Configuration;
+
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddScoped<ITimeStamper, DefaultTimeStamper>();
-            services.AddScoped<IResponseFormatter, TimeResponseFormatter>();
+            services.AddScoped<IResponseFormatter>(serviceProvider =>
+            {
+                string typeName = Configuration["services:IResponseFormatter"];
+                return (IResponseFormatter) ActivatorUtilities.CreateInstance(serviceProvider,
+                    typeName == null ? typeof(GuidService) : Type.GetType(typeName, true));
+            });
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
