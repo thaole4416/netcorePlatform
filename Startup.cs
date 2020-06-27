@@ -22,6 +22,7 @@ namespace Platform
         public void Configure(IApplicationBuilder app)
         {
             app.UseDeveloperExceptionPage();
+            app.UseHttpsRedirection();
             app.UseCookiePolicy();
             app.UseMiddleware<ConsentMiddleware>();
             app.UseSession();
