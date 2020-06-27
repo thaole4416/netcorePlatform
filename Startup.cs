@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
+using Platform.Services;
 
 namespace Platform
 {
@@ -22,11 +23,14 @@ namespace Platform
                 opts.SchemaName = "dbo";
                 opts.TableName = "DataCache";
             });
+            services.AddResponseCaching();
+            services.AddSingleton<IResponseFormatter, HtmlResponseFormatter>();
         }
 
         public void Configure(IApplicationBuilder app)
         {
             app.UseDeveloperExceptionPage();
+            app.UseResponseCaching();
             app.UseStaticFiles();
             app.UseRouting();
             app.UseEndpoints(endpoints =>
