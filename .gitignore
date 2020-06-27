@@ -34,3 +34,4 @@ msbuild.wrn
 
 #Jetbrains rider
 .idea/
+wwwroot/lib
