@@ -11,8 +11,7 @@ namespace Platform
     {
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddSingleton<IResponseFormatter, HtmlResponseFormatter>();
-        }
+            services.AddTransient<IResponseFormatter, GuidService>();         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IResponseFormatter formatter)
         {
