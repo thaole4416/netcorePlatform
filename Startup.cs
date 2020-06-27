@@ -17,6 +17,7 @@ namespace Platform
             app.UseRouting();
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapEndpoint<SumEndpoint>("/sum/{count:int=1000000000}");
                 endpoints.MapGet("/", async context => { await context.Response.WriteAsync("Hello World!"); });
             });
         }
