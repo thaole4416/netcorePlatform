@@ -18,14 +18,14 @@ namespace Platform
             app.UseRouting();
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapGet("files/{filename}.{ext}", async context => {
+                endpoints.MapGet("{first:alpha:length(3)}/{second:bool}", async context => {
                     await context.Response.WriteAsync("Request Was Routed\n");
                     foreach (var kvp in context.Request.RouteValues)
                     {
                         await context.Response.WriteAsync($"{kvp.Key}: {kvp.Value}\n");
                     }
                 });
-                endpoints.MapGet("capital/{country=France}", Capital.Endpoint);
+                endpoints.MapGet("capital/{country:regex(^uk|france|monaco$)}",Capital.Endpoint);
                 endpoints.MapGet("something/{city?}", Population.Endpoint)
                     .WithMetadata(new RouteNameMetadata("population"));
                 ;
