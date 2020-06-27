@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Platform
@@ -26,7 +27,7 @@ namespace Platform
                     }
                 });
                 endpoints.MapGet("capital/{country}", Capital.Endpoint);
-                endpoints.MapGet("population/{city}", Population.Endpoint);
+                endpoints.MapGet("something/{city}", Population.Endpoint).WithMetadata(new RouteNameMetadata("population"));;
             });
             app.Use(async (context, next) => { await context.Response.WriteAsync("Terminal Middleware Reached"); });
         }
