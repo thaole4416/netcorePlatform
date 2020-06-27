@@ -25,7 +25,7 @@ namespace Microsoft.AspNetCore.Builder
                     methodParams.Select(p =>
                         p.ParameterType == typeof(HttpContext)
                             ? context
-                            : app.ServiceProvider.GetService(p.ParameterType)).ToArray()));
+                            : context.RequestServices.GetService(p.ParameterType)).ToArray()));
         }
     }
 }
