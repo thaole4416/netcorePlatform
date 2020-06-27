@@ -17,6 +17,7 @@ namespace Platform
         {
             app.UseDeveloperExceptionPage();
             app.UseCookiePolicy();
+            app.UseMiddleware<ConsentMiddleware>();
             app.UseRouting();
             app.UseEndpoints(endpoints =>
             {
