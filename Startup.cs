@@ -1,14 +1,27 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
 
 namespace Platform
 {
     public class Startup
     {
+        public Startup(IConfiguration config)
+        {
+            Configuration = config;
+        }
+
+        private IConfiguration Configuration { get; set; }
+
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDistributedMemoryCache(opts => { opts.SizeLimit = 200; });
+            services.AddDistributedSqlServerCache(opts =>
+            {
+                opts.ConnectionString = Configuration["ConnectionStrings:CacheConnection"];
+                opts.SchemaName = "dbo";
+                opts.TableName = "DataCache";
+            });
         }
 
         public void Configure(IApplicationBuilder app)
