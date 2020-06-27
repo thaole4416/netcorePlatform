@@ -1,8 +1,12 @@
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Platform.Services;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
+using Platform.Models;
 
 namespace Platform
 {
@@ -25,9 +29,15 @@ namespace Platform
             });
             services.AddResponseCaching();
             services.AddSingleton<IResponseFormatter, HtmlResponseFormatter>();
+            services.AddDbContext<CalculationContext>(opts =>
+            {
+                opts.UseSqlServer(Configuration["ConnectionStrings:CalcConnection"]);
+            });
+            services.AddTransient<SeedData>();
         }
 
-        public void Configure(IApplicationBuilder app)
+        public void Configure(IApplicationBuilder app, IHostApplicationLifetime lifetime, IWebHostEnvironment env,
+            SeedData seedData)
         {
             app.UseDeveloperExceptionPage();
             app.UseResponseCaching();
@@ -38,6 +48,15 @@ namespace Platform
                 endpoints.MapEndpoint<SumEndpoint>("/sum/{count:int=1000000000}");
                 endpoints.MapGet("/", async context => { await context.Response.WriteAsync("Hello World!"); });
             });
+            bool cmdLineInit = (Configuration["INITDB"] ?? "false") == "true";
+            if (env.IsDevelopment() || cmdLineInit)
+            {
+                seedData.SeedDatabase();
+                if (cmdLineInit)
+                {
+                    lifetime.StopApplication();
+                }
+            }
         }
     }
 }
