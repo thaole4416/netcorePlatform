@@ -35,6 +35,7 @@ namespace Platform
 
                 await next();
             });
+            app.UseMiddleware<QueryStringMiddleWare>();
             app.UseRouting();
 
             app.UseEndpoints(endpoints =>
