@@ -22,22 +22,14 @@ namespace Platform
             app.UseRouting();
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapGet("{first:alpha:length(3)}/{second:bool}", async context =>
-                {
-                    await context.Response.WriteAsync("Request Was Routed\n");
-                    foreach (var kvp in context.Request.RouteValues)
-                    {
-                        await context.Response.WriteAsync($"{kvp.Key}: {kvp.Value}\n");
-                    }
-                });
-                endpoints.MapGet("capital/{country:countryName}", Capital.Endpoint);
-                endpoints.MapGet("something/{city?}", Population.Endpoint)
-                    .WithMetadata(new RouteNameMetadata("population"));
+                endpoints.Map("{number:int}",
+                        async context => { await context.Response.WriteAsync("Routed to the int endpoint"); })
+                    .Add(b => ((RouteEndpointBuilder) b).Order = 1);
                 ;
-                endpoints.MapFallback(async context =>
-                {
-                    await context.Response.WriteAsync("Routed to fallback endpoint");
-                });
+                endpoints.Map("{number:double}",
+                        async context => { await context.Response.WriteAsync("Routed to the double endpoint"); })
+                    .Add(b => ((RouteEndpointBuilder) b).Order = 2);
+                ;
             });
             app.Use(async (context, next) => { await context.Response.WriteAsync("Terminal Middleware Reached"); });
         }
