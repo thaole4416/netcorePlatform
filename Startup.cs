@@ -26,11 +26,20 @@ namespace Platform
                 app.UseDeveloperExceptionPage();
             }
 
+            app.Use(async (context, next) =>
+            {
+                await next();
+                await context.Response.WriteAsync("\nRun behind Terminal Middleware?");
+            });            
             app.Map("/branch", branch =>
             {
-                branch.UseMiddleware<QueryStringMiddleWare>();
-                branch.Use(async (context, next) => { await context.Response.WriteAsync($"Branch Middleware"); });
+                branch.Run(new QueryStringMiddleWare().Invoke);
             });
+            
+            app.Use(async (context, next) =>
+            {
+                await context.Response.WriteAsync("\nRun behind Terminal Middleware?");
+            });    
             app.UseMiddleware<QueryStringMiddleWare>();
             app.UseRouting();
 
