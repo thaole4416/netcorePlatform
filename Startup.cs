@@ -5,10 +5,10 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Configuration;
 
 namespace Platform
 {
@@ -23,13 +23,14 @@ namespace Platform
 
         public void ConfigureServices(IServiceCollection services)
         {
-            // configuration data can be accessed here
+            services.Configure<MessageOptions>(Configuration.GetSection("Location"));
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             app.UseDeveloperExceptionPage();
             app.UseRouting();
+            app.UseMiddleware<LocationMiddleware>();
             app.Use(async (context, next) =>
             {
                 string defaultDebug = Configuration["Logging:LogLevel:Default"];
