@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -21,12 +22,9 @@ namespace Platform
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddScoped<ITimeStamper, DefaultTimeStamper>();
-            services.AddScoped<IResponseFormatter>(serviceProvider =>
-            {
-                string typeName = Configuration["services:IResponseFormatter"];
-                return (IResponseFormatter) ActivatorUtilities.CreateInstance(serviceProvider,
-                    typeName == null ? typeof(GuidService) : Type.GetType(typeName, true));
-            });
+            services.AddScoped<IResponseFormatter, TextResponseFormatter>();
+            services.AddScoped<IResponseFormatter, HtmlResponseFormatter>();
+            services.AddScoped<IResponseFormatter, GuidService>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -48,14 +46,17 @@ namespace Platform
             });
             app.UseEndpoints(endpoints =>
             {
-                //endpoints.MapGet("/endpoint/class", WeatherEndpoint.Endpoint);
-                endpoints.MapEndpoint<WeatherEndpoint>("/endpoint/class");
-                endpoints.MapGet("/endpoint/function",
-                    async context =>
-                    {
-                        IResponseFormatter formatter = context.RequestServices.GetService<IResponseFormatter>();
-                        await formatter.Format(context, "Endpoint Function: It is sunny in LA");
-                    });
+                endpoints.MapGet("/single", async context =>
+                {
+                    IResponseFormatter formatter = context.RequestServices.GetService<IResponseFormatter>();
+                    await formatter.Format(context, "Single service");
+                });
+                endpoints.MapGet("/", async context =>
+                {
+                    IResponseFormatter formatter = context.RequestServices.GetServices<IResponseFormatter>()
+                        .First(f => f.RichOutput);
+                    await formatter.Format(context, "Multiple services");
+                });
             });
         }
     }
