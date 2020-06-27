@@ -10,11 +10,13 @@ namespace Platform
     {
         public void ConfigureServices(IServiceCollection services)
         {
+            services.Configure<CookiePolicyOptions>(opts => { opts.CheckConsentNeeded = context => true; });
         }
 
         public void Configure(IApplicationBuilder app)
         {
             app.UseDeveloperExceptionPage();
+            app.UseCookiePolicy();
             app.UseRouting();
             app.UseEndpoints(endpoints =>
             {
@@ -22,7 +24,7 @@ namespace Platform
                 {
                     int counter1 = int.Parse(context.Request.Cookies["counter1"] ?? "0") + 1;
                     context.Response.Cookies.Append("counter1", counter1.ToString(),
-                        new CookieOptions {MaxAge = TimeSpan.FromMinutes(30)});
+                        new CookieOptions {MaxAge = TimeSpan.FromMinutes(30), IsEssential = true});
                     int counter2 = int.Parse(context.Request.Cookies["counter2"] ?? "0") + 1;
                     context.Response.Cookies.Append("counter2", counter1.ToString(),
                         new CookieOptions {MaxAge = TimeSpan.FromMinutes(30)});
